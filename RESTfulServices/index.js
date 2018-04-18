@@ -1,3 +1,4 @@
+const Joi = require("joi");
 const express = require("express");
 const app = express();
 
@@ -28,6 +29,15 @@ app.get("/api/courses/:id", (req, res) =>{
 });
 
 app.post("/api/courses", (req, res) => {
+    const schema = {
+        name: Joi.string().min(3).required()
+    };
+
+    const result = Joi.validate(req.body, schema);
+    if(result.error){
+        res.status(400).send(result.error.details[0].message);
+        return;
+    }
     const course = {
         id: courses.length + 1,
         name: req.body.name
@@ -36,15 +46,37 @@ app.post("/api/courses", (req, res) => {
     res.send(course);
 });
 
+app.put("/api/courses/:id", (req, res)=>{
+    // Look up the course
+    //If not existing return 404
+    const course = courses.find(c => c.id === parseInt(req.params.id));
+    if(!course) res.status(404).send("The course with the given id was not found");//404 -- object not found
+    
+    //validate
+    //if invalid, return 400 - Bad request
+    const schema = {
+        name: Joi.string().min(3).required()
+    };
+
+    const result = Joi.validate(req.body, schema);
+    if(result.error){
+        res.status(400).send(result.error.details[0].message);
+        return;
+    }
+    //update course
+    //Return the updated course
+
+});
+
 app.delete("/api/courses", (req,res) => {
     const courseToDelete = courses.findIndex(c => c.id === parseInt(req.body.id));
     if(!courseToDelete) 
     {
-        res.status(404).send("The course with the given id was not found");
+        res.status(404).send("The course with the given id was not found "+ req.body.id);
     }
     else{
         courses.splice(courseToDelete,1);
-        res.status(200).send("sos groso pibe");
+        res.status(200).send("sos groso pibe "+courseToDelete);
     }    
 });
 
