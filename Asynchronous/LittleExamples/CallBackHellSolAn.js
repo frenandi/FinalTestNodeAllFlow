@@ -1,9 +1,5 @@
 console.log("Before");
-getUser(1, (user) => {
-    getRepositories(user.username,(repositories) => {
-        console.log(repositories);
-    });
-});
+getUser(1, getUserRepositories);
 console.log("After");
 
 function getUser(id, callback){
@@ -18,4 +14,12 @@ function getRepositories(username, callback){
         console.log("getting repositories");
         callback(["repo1", "repo2", "repo3"]);
     },2000);
+}
+
+function displayRepositories(repositories){
+    console.log(repositories);
+}
+
+function getUserRepositories(user){
+    getRepositories(user.username,displayRepositories);
 }
